@@ -1,0 +1,1100 @@
+<!DOCTYPE html>
+<!-- 
+  DOCTYPE le dice al navegador: "esto es HTML5, el estándar moderno".
+  Sin esto, algunos navegadores activan "quirks mode" (modo raro/viejo).
+-->
+
+<html lang="es">
+<!-- lang="es" es importante para accesibilidad: los lectores de pantalla
+     usan esto para saber en qué idioma leer el contenido. -->
+
+<head>
+  <!-- HEAD: todo lo que el navegador necesita saber, pero que el usuario NO ve directamente -->
+
+  <meta charset="UTF-8">
+  <!-- charset=UTF-8: soporte para tildes, ñ, emojis, etc. Siempre va primero. -->
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- viewport: hace que la página sea responsive.
+       Sin esto, en celular se vería como una página de escritorio reducida. -->
+
+  <meta name="description" content="Portfolio de Matias De Arriba — QA Tester orientado a automatización con Python.">
+  <!-- description: lo que aparece en Google debajo del título. Importante para SEO. -->
+
+  <title>Matias De Arriba — QA Tester</title>
+  <!-- title: el texto que aparece en la pestaña del navegador -->
+
+  <!-- ===== GOOGLE FONTS =====
+       Importamos dos tipografías desde Google Fonts (gratis).
+       - Inter: sans-serif moderna, muy legible en pantalla.
+       - JetBrains Mono: tipografía monoespaciada (la de código).
+       La URL con "display=swap" mejora la performance: muestra el texto
+       con una fuente del sistema mientras carga la custom. -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+  <style>
+    /* =====================================================
+       CSS — Cascade Style Sheets
+       Aquí le decimos al navegador cómo se ve cada elemento.
+       
+       CASCADA: si hay dos reglas para el mismo elemento,
+       gana la que viene después (o la más específica).
+       
+       SELECTOR: le dice A QUÉ elemento aplicar el estilo.
+       .clase → selecciona elementos con esa clase
+       #id    → selecciona el elemento con ese id (único)
+       etiqueta → selecciona todas las etiquetas de ese tipo
+       ===================================================== */
+
+    /* ---- RESET & BASE ----
+       Los navegadores tienen estilos propios que difieren entre sí.
+       Este bloque los resetea para que todo parta del mismo punto. */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      /* box-sizing: border-box hace que el padding y el border
+         se cuenten DENTRO del ancho/alto del elemento.
+         Sin esto, un div de 300px con padding 20px mediría 340px. Caos. */
+      margin: 0;
+      padding: 0;
+    }
+
+    /* ---- VARIABLES CSS ----
+       :root es el elemento raíz (el <html>).
+       Las variables CSS empiezan con --
+       Se usan como: color: var(--color-accent)
+       Ventaja: cambiás el valor en un lugar y se actualiza en todo el código. */
+    :root {
+      --color-bg: #0a0a0a;           /* Fondo principal: casi negro */
+      --color-bg-card: #111111;      /* Fondo de tarjetas: negro un poco más claro */
+      --color-bg-hover: #181818;     /* Fondo al hacer hover sobre tarjetas */
+      --color-border: #222222;       /* Color de bordes */
+      --color-border-hover: #333333; /* Color de bordes al hacer hover */
+      --color-accent: #7C6FF7;       /* Acento principal: violeta suave */
+      --color-accent-dim: rgba(124, 111, 247, 0.15); /* Violeta muy transparente para fondos */
+      --color-text-primary: #f0f0f0; /* Texto principal: casi blanco */
+      --color-text-secondary: #888;  /* Texto secundario: gris medio */
+      --color-text-muted: #555;      /* Texto muted: gris oscuro */
+      --color-green: #3fb950;        /* Verde para "disponible" */
+      
+      --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      /* -apple-system y BlinkMacSystemFont son las fuentes del sistema en Mac/iOS.
+         Si Inter no carga, el navegador usa esas como fallback. */
+      --font-mono: 'JetBrains Mono', 'Courier New', monospace;
+      /* Fuente monoespaciada: cada carácter ocupa el mismo ancho. Ideal para código. */
+      
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --radius-lg: 16px;
+      /* Valores de border-radius reutilizables para esquinas redondeadas */
+      
+      --max-width: 780px;
+      /* Ancho máximo del contenido. Sin esto, en pantallas anchas el texto
+         se estira demasiado y se vuelve difícil de leer. */
+    }
+
+    /* ---- ELEMENTO BASE ----
+       html y body son los dos contenedores raíz de toda la página. */
+    html {
+      scroll-behavior: smooth;
+      /* Hace que los links de ancla (#seccion) scrolleen suavemente
+         en vez de saltar de golpe. */
+    }
+
+    body {
+      font-family: var(--font-sans); /* Usamos la variable que definimos arriba */
+      background-color: var(--color-bg);
+      color: var(--color-text-primary);
+      line-height: 1.7;
+      /* line-height: espacio entre líneas. 1.7 = 170% del tamaño de fuente.
+         Mejora mucho la legibilidad en párrafos largos. */
+      -webkit-font-smoothing: antialiased;
+      /* Suaviza el renderizado de fuentes en Mac. Hace que el texto se vea más fino y limpio. */
+    }
+
+    /* ---- LAYOUT PRINCIPAL ----
+       .container es el div que centraliza todo el contenido.
+       max-width limita el ancho, margin: 0 auto lo centra horizontalmente. */
+    .container {
+      max-width: var(--max-width);
+      margin: 0 auto;
+      /* margin: 0 (arriba/abajo) auto (izquierda/derecha)
+         El valor "auto" en los lados divide el espacio disponible en partes iguales
+         → centra el elemento horizontalmente. */
+      padding: 0 24px;
+      /* Padding lateral para que en mobile el contenido no toque el borde de la pantalla */
+    }
+
+    /* ==========================================
+       NAVEGACIÓN
+       ========================================== */
+    nav {
+      position: sticky;
+      top: 0;
+      /* sticky: el nav se queda pegado arriba cuando scrolleás.
+         Diferencia con fixed: sticky respeta el flujo del documento
+         y solo se "pega" cuando llegas a su posición. */
+      z-index: 100;
+      /* z-index controla qué elemento queda "encima" cuando se superponen.
+         Mayor número = más arriba. 100 garantiza que el nav tape todo lo demás. */
+      background: rgba(10, 10, 10, 0.85);
+      /* rgba: red, green, blue, alpha (transparencia).
+         El 0.85 hace que sea casi opaco pero deje ver un poco el fondo. */
+      backdrop-filter: blur(12px);
+      /* Efecto frosted glass: difumina lo que hay detrás del nav.
+         -webkit- es el prefijo para Safari/Chrome más viejos. */
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    .nav-inner {
+      max-width: var(--max-width);
+      margin: 0 auto;
+      padding: 0 24px;
+      height: 56px;
+      /* height fija en lugar de padding vertical para que el nav
+         siempre tenga la misma altura sin importar el contenido */
+      display: flex;
+      align-items: center;
+      /* Flexbox: el modelo de layout más usado en CSS moderno.
+         display: flex → activa flexbox en el contenedor.
+         align-items: center → centra los hijos verticalmente. */
+      justify-content: space-between;
+      /* justify-content: distribuye los hijos horizontalmente.
+         space-between → uno a la izquierda, otro a la derecha. */
+    }
+
+    .nav-logo {
+      font-family: var(--font-mono);
+      font-size: 14px;
+      color: var(--color-text-primary);
+      text-decoration: none;
+      letter-spacing: -0.02em;
+      /* letter-spacing negativo junta un poco las letras.
+         Da un look más compacto y moderno a textos grandes o monoespaciados. */
+    }
+
+    .nav-logo span {
+      /* span dentro del logo — el cursor parpadeante */
+      color: var(--color-accent);
+      animation: blink 1.2s step-end infinite;
+      /* animation: nombre duración función-de-tiempo iteraciones
+         step-end hace que el blink sea instantáneo (sin transición suave) */
+    }
+
+    /* @keyframes define los estados de una animación */
+    @keyframes blink {
+      0%, 100% { opacity: 1; }  /* visible */
+      50% { opacity: 0; }       /* invisible */
+      /* Resultado: parpadea como un cursor de terminal */
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 24px;
+      /* gap en flexbox: espacio entre los hijos. Más limpio que usar margin. */
+      list-style: none;
+      /* Saca los bullets de la lista <ul> */
+    }
+
+    .nav-links a {
+      font-size: 13px;
+      color: var(--color-text-secondary);
+      text-decoration: none;
+      transition: color 0.2s ease;
+      /* transition: qué propiedad animar, duración, curva.
+         Hace que el cambio de color en hover sea suave en vez de instantáneo. */
+    }
+
+    .nav-links a:hover {
+      /* :hover es una pseudo-clase: aplica estilos cuando el mouse está encima */
+      color: var(--color-text-primary);
+    }
+
+    /* ==========================================
+       SECCIONES GENERALES
+       ========================================== */
+    section {
+      padding: 72px 0;
+      /* padding: espacio interno. 72px arriba y abajo, 0 a los lados
+         (el .container ya maneja el padding lateral) */
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    section:last-of-type {
+      /* :last-of-type selecciona el último elemento de ese tipo (section)
+         dentro de su padre. Saca el borde del último. */
+      border-bottom: none;
+    }
+
+    .section-eyebrow {
+      /* "eyebrow": término de diseño para el texto pequeño encima del título principal */
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--color-accent);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+      /* Creamos un separador visual antes de poner el título.
+         Es una firma del diseño: texto monoespaciado en violeta. */
+    }
+
+    .section-title {
+      font-size: 28px;
+      font-weight: 600;
+      color: var(--color-text-primary);
+      margin-bottom: 8px;
+      letter-spacing: -0.02em;
+    }
+
+    .section-subtitle {
+      font-size: 15px;
+      color: var(--color-text-secondary);
+      margin-bottom: 48px;
+      max-width: 500px;
+    }
+
+    /* ==========================================
+       HERO (sección principal / introducción)
+       ========================================== */
+    .hero {
+      padding: 80px 0 72px;
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    .hero-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(63, 185, 80, 0.1);
+      /* Color verde muy transparente para el badge de "disponible" */
+      border: 1px solid rgba(63, 185, 80, 0.25);
+      border-radius: 20px;
+      /* border-radius muy alto = pill (forma de pastilla) */
+      padding: 5px 14px;
+      font-size: 12px;
+      color: var(--color-green);
+      margin-bottom: 28px;
+    }
+
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      background: var(--color-green);
+      border-radius: 50%;
+      /* border-radius: 50% en un cuadrado = círculo perfecto */
+      animation: pulse 2s ease-in-out infinite;
+      /* El punto verde "pulsa" para llamar la atención */
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.6; transform: scale(0.85); }
+      /* transform: scale() escala el elemento. 0.85 = 85% del tamaño original.
+         Combinado con la opacidad da efecto de latido. */
+    }
+
+    .hero-name {
+      font-size: clamp(36px, 6vw, 52px);
+      /* clamp(mínimo, preferido, máximo): tamaño fluido.
+         36px como mínimo (mobile), 52px como máximo (desktop),
+         6vw (6% del ancho del viewport) como valor preferido.
+         Esto hace que el texto se agrande/achique automáticamente con la pantalla. */
+      font-weight: 600;
+      line-height: 1.1;
+      letter-spacing: -0.03em;
+      margin-bottom: 6px;
+    }
+
+    .hero-role {
+      font-size: clamp(18px, 3vw, 24px);
+      font-weight: 400;
+      color: var(--color-text-secondary);
+      margin-bottom: 20px;
+      font-family: var(--font-mono);
+    }
+
+    .hero-role .accent {
+      color: var(--color-accent);
+      /* .accent dentro de .hero-role: selector descendente.
+         Solo aplica a elementos con clase .accent que estén DENTRO de .hero-role */
+    }
+
+    .hero-bio {
+      font-size: 16px;
+      color: var(--color-text-secondary);
+      max-width: 520px;
+      margin-bottom: 32px;
+      line-height: 1.75;
+    }
+
+    /* ---- PILLS / TAGS DE TECNOLOGÍAS ---- */
+    .tech-pills {
+      display: flex;
+      flex-wrap: wrap;
+      /* flex-wrap: wrap → si los elementos no caben en una fila,
+         bajan a la siguiente. Sin esto se saldría del contenedor. */
+      gap: 8px;
+      margin-bottom: 36px;
+    }
+
+    .pill {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--color-text-secondary);
+      background: var(--color-bg-card);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      padding: 4px 10px;
+      transition: border-color 0.2s, color 0.2s;
+    }
+
+    .pill:hover {
+      border-color: var(--color-accent);
+      color: var(--color-accent);
+    }
+
+    /* ---- BOTONES ---- */
+    .hero-ctas {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 20px;
+      border-radius: var(--radius-md);
+      font-size: 14px;
+      font-weight: 500;
+      text-decoration: none;
+      transition: all 0.2s ease;
+      cursor: pointer;
+      border: none;
+      font-family: var(--font-sans);
+    }
+
+    .btn-primary {
+      background: var(--color-accent);
+      color: #fff;
+    }
+
+    .btn-primary:hover {
+      background: #6a5fe0;
+      /* Color un poco más oscuro al hacer hover: feedback visual para el usuario */
+      transform: translateY(-1px);
+      /* Sube 1px: micro-animación que da sensación de "levantar" el botón */
+    }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--color-text-secondary);
+      border: 1px solid var(--color-border);
+    }
+
+    .btn-ghost:hover {
+      border-color: var(--color-border-hover);
+      color: var(--color-text-primary);
+      transform: translateY(-1px);
+    }
+
+    /* Ícono SVG inline dentro de los botones */
+    .btn svg {
+      width: 16px;
+      height: 16px;
+      flex-shrink: 0;
+      /* flex-shrink: 0 evita que el ícono se achique si hay poco espacio */
+    }
+
+    /* ==========================================
+       PROYECTOS
+       ========================================== */
+
+    /* Badge de categoría en cada proyecto */
+    .project-tag {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 500;
+      padding: 3px 8px;
+      border-radius: var(--radius-sm);
+      display: inline-block;
+      /* inline-block: se comporta como inline (no ocupa todo el ancho)
+         pero acepta width, height, padding como block. */
+    }
+
+    /* Cada variante de tag tiene su propio color.
+       Así se puede ver de un vistazo qué tipo de proyecto es. */
+    .tag-qa       { background: rgba(124,111,247,0.15); color: #a99af8; }
+    .tag-js       { background: rgba(240,180,41,0.12);  color: #d4a017; }
+    .tag-react    { background: rgba(97,218,251,0.12);  color: #61dbfb; }
+    .tag-html     { background: rgba(227,76,38,0.12);   color: #e34c26; }
+    .tag-python   { background: rgba(55,178,77,0.12);   color: #4caf50; }
+
+    .projects-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      /* CSS Grid: sistema de layout en dos dimensiones.
+         auto-fill: llena la fila con tantas columnas como entren.
+         minmax(320px, 1fr): cada columna tiene mínimo 320px, máximo 1 fracción del espacio disponible.
+         Resultado: 2 columnas en desktop, 1 en mobile. Automático y sin media queries. */
+      gap: 16px;
+    }
+
+    .project-card {
+      background: var(--color-bg-card);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      /* flex-direction: column → los hijos se apilan verticalmente */
+      gap: 12px;
+      transition: border-color 0.2s, background 0.2s, transform 0.2s;
+      text-decoration: none;
+      /* La tarjeta entera es un <a>, así toda el área es clickeable */
+      color: inherit;
+      /* color: inherit → hereda el color del padre.
+         Sin esto, los <a> serían azul/violeta por defecto del navegador. */
+    }
+
+    .project-card:hover {
+      border-color: var(--color-border-hover);
+      background: var(--color-bg-hover);
+      transform: translateY(-2px);
+      /* Sube 2px al hacer hover: efecto "levitar" suave */
+    }
+
+    .project-card.featured {
+      border-color: var(--color-accent);
+      /* La tarjeta destacada tiene borde violeta */
+      grid-column: 1 / -1;
+      /* Ocupa TODAS las columnas de la grilla.
+         1 / -1 significa "desde la línea 1 hasta la última línea". */
+    }
+
+    .featured-label {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--color-accent);
+      background: var(--color-accent-dim);
+      padding: 3px 8px;
+      border-radius: var(--radius-sm);
+      display: inline-block;
+      width: fit-content;
+      /* fit-content: el elemento ocupa solo el espacio que necesita su contenido */
+    }
+
+    .project-title {
+      font-size: 17px;
+      font-weight: 600;
+      color: var(--color-text-primary);
+    }
+
+    .project-desc {
+      font-size: 13px;
+      color: var(--color-text-secondary);
+      line-height: 1.6;
+      flex: 1;
+      /* flex: 1 hace que este elemento crezca para ocupar el espacio disponible.
+         Útil para alinear el footer de la tarjeta siempre abajo. */
+    }
+
+    .project-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 4px;
+      padding-top: 12px;
+      border-top: 1px solid var(--color-border);
+    }
+
+    .project-meta {
+      font-size: 12px;
+      color: var(--color-text-muted);
+      font-family: var(--font-mono);
+    }
+
+    .project-arrow {
+      width: 18px;
+      height: 18px;
+      color: var(--color-text-muted);
+      transition: transform 0.2s, color 0.2s;
+    }
+
+    .project-card:hover .project-arrow {
+      /* Selector de descendente: el .project-arrow DENTRO de .project-card:hover */
+      transform: translate(2px, -2px);
+      /* Mueve la flecha diagonal al hacer hover: feedback de "ir a esa página" */
+      color: var(--color-accent);
+    }
+
+    /* ==========================================
+       SOBRE MÍ
+       ========================================== */
+    .about-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 48px;
+      align-items: start;
+      /* align-items: start → las columnas se alinean desde arriba,
+         no se estiran para tener la misma altura */
+    }
+
+    .about-text p {
+      font-size: 15px;
+      color: var(--color-text-secondary);
+      margin-bottom: 16px;
+      line-height: 1.8;
+    }
+
+    .about-text p:last-child {
+      margin-bottom: 0;
+    }
+
+    .about-text strong {
+      color: var(--color-text-primary);
+      font-weight: 500;
+    }
+
+    /* ---- LISTA DE SKILLS CON NIVEL ---- */
+    .skills-list {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .skill-item {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .skill-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .skill-name {
+      font-size: 13px;
+      font-weight: 500;
+      font-family: var(--font-mono);
+      color: var(--color-text-primary);
+    }
+
+    .skill-level {
+      font-size: 11px;
+      color: var(--color-text-muted);
+      font-family: var(--font-mono);
+    }
+
+    .skill-bar {
+      height: 3px;
+      background: var(--color-border);
+      border-radius: 2px;
+      overflow: hidden;
+      /* overflow: hidden recorta el ::after que hace el fill de la barra */
+    }
+
+    .skill-bar::after {
+      /* ::after es un pseudo-elemento: agrega contenido DESPUÉS del elemento
+         sin necesitar un div extra en el HTML. */
+      content: '';
+      /* content vacío es necesario para que el pseudo-elemento exista */
+      display: block;
+      height: 100%;
+      background: var(--color-accent);
+      border-radius: 2px;
+      width: var(--pct);
+      /* --pct es una variable CSS que se define inline en el HTML:
+         style="--pct: 75%"
+         Así cada barra tiene su propio porcentaje sin necesitar clases extra. */
+    }
+
+    /* ==========================================
+       CONTACTO
+       ========================================== */
+    .contact-section {
+      text-align: center;
+    }
+
+    .contact-section .section-eyebrow,
+    .contact-section .section-title,
+    .contact-section .section-subtitle {
+      text-align: center;
+      /* Centramos texto en la sección de contacto */
+    }
+
+    .contact-section .section-subtitle {
+      margin: 0 auto 40px;
+      /* auto en izquierda/derecha centra el elemento (que tiene max-width) */
+    }
+
+    .contact-links {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .contact-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 11px 20px;
+      background: var(--color-bg-card);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      text-decoration: none;
+      color: var(--color-text-secondary);
+      font-size: 14px;
+      transition: all 0.2s;
+    }
+
+    .contact-link:hover {
+      border-color: var(--color-accent);
+      color: var(--color-accent);
+      transform: translateY(-2px);
+    }
+
+    .contact-link svg {
+      width: 18px;
+      height: 18px;
+      flex-shrink: 0;
+    }
+
+    /* ==========================================
+       FOOTER
+       ========================================== */
+    footer {
+      padding: 32px 0;
+      text-align: center;
+    }
+
+    .footer-text {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--color-text-muted);
+    }
+
+    .footer-text span {
+      color: var(--color-accent);
+    }
+
+    /* ==========================================
+       RESPONSIVE — MEDIA QUERIES
+       Las media queries aplican estilos solo cuando
+       se cumple una condición (ancho de pantalla, etc.)
+       
+       @media (max-width: 600px) significa:
+       "aplicar estos estilos cuando la pantalla tenga 600px o menos"
+       Es decir: en mobile.
+       ========================================== */
+    @media (max-width: 600px) {
+      .nav-links {
+        display: none;
+        /* Ocultamos los links en mobile para no saturar el nav.
+           En un proyecto real agregarías un menú hamburguesa. */
+      }
+
+      .about-grid {
+        grid-template-columns: 1fr;
+        /* En mobile: una sola columna en vez de dos */
+        gap: 32px;
+      }
+
+      .project-card.featured {
+        grid-column: auto;
+        /* En mobile no tiene sentido que ocupe "todas las columnas"
+           si solo hay una columna. Volvemos al comportamiento normal. */
+      }
+
+      .hero-name {
+        font-size: 32px;
+      }
+    }
+
+  </style>
+</head>
+
+<body>
+
+  <!-- =====================================================
+       NAVEGACIÓN
+       <nav> es una etiqueta semántica: le dice al navegador
+       y a los lectores de pantalla "esto es navegación".
+       Otras etiquetas semánticas: <header>, <main>, <footer>, 
+       <section>, <article>, <aside>.
+       Son idénticas a <div> en comportamiento pero añaden significado.
+       ===================================================== -->
+  <nav>
+    <div class="nav-inner">
+
+      <!-- El logo es un link que vuelve al inicio (#) -->
+      <a href="#" class="nav-logo">
+        matias@portfolio<span>_</span>
+        <!-- El span con el cursor parpadeante (animado en CSS arriba) -->
+      </a>
+
+      <!-- <ul> lista desordenada, <li> item de lista -->
+      <ul class="nav-links">
+        <li><a href="#proyectos">proyectos</a></li>
+        <li><a href="#sobre-mi">sobre mí</a></li>
+        <li><a href="#contacto">contacto</a></li>
+        <!-- href="#id" scrollea suavemente hasta el elemento con ese id -->
+      </ul>
+
+    </div>
+  </nav>
+
+  <!-- <main> envuelve el contenido principal de la página.
+       Solo debe haber un <main> por página. -->
+  <main>
+
+    <!-- ==========================================
+         HERO
+         ========================================== -->
+    <section class="hero">
+      <div class="container">
+
+        <!-- Badge de disponibilidad -->
+        <div class="hero-status">
+          <div class="status-dot"></div>
+          disponible para oportunidades
+        </div>
+
+        <!-- h1: el título más importante de la página.
+             Solo debe haber un <h1> por página (SEO + accesibilidad).
+             Los motores de búsqueda le dan mucho peso a este elemento. -->
+        <h1 class="hero-name">Matias De Arriba</h1>
+
+        <!-- h2: subtítulo. Los headings van en orden: h1 → h2 → h3, nunca saltear niveles. -->
+        <h2 class="hero-role">
+          QA Tester → <span class="accent">automation</span>
+        </h2>
+
+        <p class="hero-bio">
+          Soy de Buenos Aires y estoy en transición hacia QA Automation con Python. 
+          Me especializo en testing de backend y APIs. Me apasiona encontrar el 
+          <strong>"por qué"</strong> detrás de cada bug y documentar todo de forma clara.
+        </p>
+
+        <!-- Lista de tecnologías como "pills" -->
+        <div class="tech-pills">
+          <!-- Cada span es una pill. No son links porque no llevan a ningún lado. -->
+          <span class="pill">Python</span>
+          <span class="pill">Selenium</span>
+          <span class="pill">Postman</span>
+          <span class="pill">SQL</span>
+          <span class="pill">Jira</span>
+          <span class="pill">Git</span>
+          <span class="pill">HTML/CSS</span>
+          <span class="pill">JavaScript</span>
+          <span class="pill">React</span>
+        </div>
+
+        <!-- CTAs (Call To Action): botones principales -->
+        <div class="hero-ctas">
+          <!-- target="_blank": abre el link en una pestaña nueva.
+               rel="noopener noreferrer": seguridad. Sin esto, la página nueva
+               podría acceder a window.opener y hacer phishing. Siempre ponelo
+               con target="_blank". -->
+          <a href="#proyectos" class="btn btn-primary">
+            <!-- SVG inline: ícono de código.
+                 SVG = Scalable Vector Graphics: se ve nítido en cualquier resolución.
+                 xmlns es el namespace requerido por SVG. -->
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="16 18 22 12 16 6"></polyline>
+              <polyline points="8 6 2 12 8 18"></polyline>
+            </svg>
+            ver proyectos
+          </a>
+          <a href="https://github.com/MatiasDeArriba" target="_blank" rel="noopener noreferrer" class="btn btn-ghost">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path>
+            </svg>
+            GitHub
+          </a>
+          <a href="https://www.linkedin.com/in/matias-de-arriba/" target="_blank" rel="noopener noreferrer" class="btn btn-ghost">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path>
+              <rect x="2" y="9" width="4" height="12"></rect>
+              <circle cx="4" cy="4" r="2"></circle>
+            </svg>
+            LinkedIn
+          </a>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ==========================================
+         PROYECTOS
+         id="proyectos": el nav link href="#proyectos" scrollea hasta acá
+         ========================================== -->
+    <section id="proyectos">
+      <div class="container">
+        <p class="section-eyebrow">// proyectos</p>
+        <h2 class="section-title">Trabajo que me representa</h2>
+        <p class="section-subtitle">
+          Una mezcla de proyectos QA y desarrollo. Algunos ejercicios de cursada, 
+          otros proyectos propios.
+        </p>
+
+        <!-- CSS Grid definido arriba: 2 columnas en desktop, 1 en mobile -->
+        <div class="projects-grid">
+
+          <!-- PROYECTO DESTACADO: tiene clase "featured" → borde violeta y ocupa todo el ancho -->
+          <a href="https://github.com/MatiasDeArriba/proyecto-pre-entrega" 
+             target="_blank" rel="noopener noreferrer" 
+             class="project-card featured">
+            <div>
+              <span class="featured-label">↑ destacado</span>
+            </div>
+            <div>
+              <span class="project-tag tag-qa">QA Manual</span>
+            </div>
+            <h3 class="project-title">Testing de eCommerce — Talentolab</h3>
+            <!-- h3 dentro de un article/section está bien: mantiene la jerarquía h1 > h2 > h3 -->
+            <p class="project-desc">
+              Proyecto de testing completo sobre la plataforma Talentolab Test. 
+              Incluye casos de prueba funcionales, matriz de trazabilidad, reporte 
+              de bugs documentado en Jira y validaciones SQL sobre la base de datos.
+            </p>
+            <div class="project-footer">
+              <span class="project-meta">casos de prueba · bugs · SQL</span>
+              <svg class="project-arrow" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="7" y1="17" x2="17" y2="7"></line>
+                <polyline points="7 7 17 7 17 17"></polyline>
+              </svg>
+            </div>
+          </a>
+
+          <!-- PROYECTO: Juego de Memoria -->
+          <a href="https://github.com/MatiasDeArriba/juego-de-memoria" 
+             target="_blank" rel="noopener noreferrer" 
+             class="project-card">
+            <div><span class="project-tag tag-react">React</span></div>
+            <h3 class="project-title">Juego de memoria</h3>
+            <p class="project-desc">
+              App de memoria interactiva construida con React. Manejo de estado 
+              con useState y lógica de juego en JavaScript puro.
+            </p>
+            <div class="project-footer">
+              <span class="project-meta">React · hooks · state</span>
+              <svg class="project-arrow" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="7" y1="17" x2="17" y2="7"></line>
+                <polyline points="7 7 17 7 17 17"></polyline>
+              </svg>
+            </div>
+          </a>
+
+          <!-- PROYECTO: Piedra Papel Tijera -->
+          <a href="https://github.com/MatiasDeArriba/piedra-papel-tijera" 
+             target="_blank" rel="noopener noreferrer" 
+             class="project-card">
+            <div><span class="project-tag tag-js">JavaScript</span></div>
+            <h3 class="project-title">Piedra, papel o tijera</h3>
+            <p class="project-desc">
+              Juego al mejor de 5 con historial, marcador y lógica completa. 
+              JS puro, sin frameworks.
+            </p>
+            <div class="project-footer">
+              <span class="project-meta">JS · DOM · lógica</span>
+              <svg class="project-arrow" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="7" y1="17" x2="17" y2="7"></line>
+                <polyline points="7 7 17 7 17 17"></polyline>
+              </svg>
+            </div>
+          </a>
+
+          <!-- PROYECTO: Car Detailing -->
+          <a href="https://github.com/MatiasDeArriba/Proyecto-De-Arriba-Car-Detailing" 
+             target="_blank" rel="noopener noreferrer" 
+             class="project-card">
+            <div><span class="project-tag tag-html">HTML / CSS</span></div>
+            <h3 class="project-title">Car Detailing</h3>
+            <p class="project-desc">
+              Landing page para taller de pintura y estética automotriz. 
+              Diseño moderno y responsive.
+            </p>
+            <div class="project-footer">
+              <span class="project-meta">HTML · CSS · responsive</span>
+              <svg class="project-arrow" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="7" y1="17" x2="17" y2="7"></line>
+                <polyline points="7 7 17 7 17 17"></polyline>
+              </svg>
+            </div>
+          </a>
+
+          <!-- PROYECTO: Gym Landing -->
+          <a href="https://github.com/MatiasDeArriba/Proyecto-Gym" 
+             target="_blank" rel="noopener noreferrer" 
+             class="project-card">
+            <div><span class="project-tag tag-html">HTML / CSS / JS</span></div>
+            <h3 class="project-title">Gym Landing Page</h3>
+            <p class="project-desc">
+              Landing page responsive para gimnasio con slider dinámico 
+              y diseño moderno.
+            </p>
+            <div class="project-footer">
+              <span class="project-meta">HTML · CSS · JS · slider</span>
+              <svg class="project-arrow" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="7" y1="17" x2="17" y2="7"></line>
+                <polyline points="7 7 17 7 17 17"></polyline>
+              </svg>
+            </div>
+          </a>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         SOBRE MÍ
+         ========================================== -->
+    <section id="sobre-mi">
+      <div class="container">
+        <p class="section-eyebrow">// sobre mí</p>
+        <h2 class="section-title">Un poco de contexto</h2>
+
+        <!-- Grid de 2 columnas: texto izquierda, skills derecha -->
+        <div class="about-grid">
+
+          <!-- Columna izquierda: texto -->
+          <div class="about-text">
+            <p>
+              Soy <strong>Matias De Arriba</strong>, de Buenos Aires. 
+              Actualmente me estoy formando en <strong>QA Automation con Python</strong>, 
+              con foco en testing de backend y APIs.
+            </p>
+            <p>
+              Empecé en QA Manual y fui incorporando herramientas de automatización. 
+              Me interesa entender <strong>cómo funcionan las cosas por dentro</strong> — 
+              eso me hace mejor tester.
+            </p>
+            <p>
+              Fuera del tech soy fanático de <strong>Boca Juniors</strong> 💙💛, 
+              la <strong>Fórmula 1</strong>, los libros y los videojuegos.
+            </p>
+          </div>
+
+          <!-- Columna derecha: barras de habilidades -->
+          <div class="skills-list">
+
+            <!-- Cada skill-item tiene una variable CSS --pct que define el % de la barra.
+                 Esto se lee en el CSS con var(--pct) en el pseudo-elemento ::after -->
+            <div class="skill-item">
+              <div class="skill-header">
+                <span class="skill-name">QA Manual</span>
+                <span class="skill-level">sólido</span>
+              </div>
+              <div class="skill-bar" style="--pct: 85%"></div>
+            </div>
+
+            <div class="skill-item">
+              <div class="skill-header">
+                <span class="skill-name">Postman / APIs</span>
+                <span class="skill-level">cómodo</span>
+              </div>
+              <div class="skill-bar" style="--pct: 75%"></div>
+            </div>
+
+            <div class="skill-item">
+              <div class="skill-header">
+                <span class="skill-name">Python</span>
+                <span class="skill-level">en progreso</span>
+              </div>
+              <div class="skill-bar" style="--pct: 55%"></div>
+            </div>
+
+            <div class="skill-item">
+              <div class="skill-header">
+                <span class="skill-name">Selenium</span>
+                <span class="skill-level">en progreso</span>
+              </div>
+              <div class="skill-bar" style="--pct: 45%"></div>
+            </div>
+
+            <div class="skill-item">
+              <div class="skill-header">
+                <span class="skill-name">SQL</span>
+                <span class="skill-level">cómodo</span>
+              </div>
+              <div class="skill-bar" style="--pct: 65%"></div>
+            </div>
+
+            <div class="skill-item">
+              <div class="skill-header">
+                <span class="skill-name">HTML / CSS / JS</span>
+                <span class="skill-level">cómodo</span>
+              </div>
+              <div class="skill-bar" style="--pct: 60%"></div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         CONTACTO
+         ========================================== -->
+    <section id="contacto" class="contact-section">
+      <div class="container">
+        <p class="section-eyebrow">// contacto</p>
+        <h2 class="section-title">¿Hablamos?</h2>
+        <p class="section-subtitle">
+          Abierto a oportunidades en QA Manual, QA Automation o roles junior en tech. 
+          Respondó rápido.
+        </p>
+
+        <div class="contact-links">
+
+          <a href="mailto:matiasdearriba10@gmail.com" class="contact-link">
+            <!-- SVG de sobre de email -->
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+              <polyline points="22,6 12,13 2,6"></polyline>
+            </svg>
+            Email
+          </a>
+
+          <a href="https://www.linkedin.com/in/matias-de-arriba/" target="_blank" rel="noopener noreferrer" class="contact-link">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path>
+              <rect x="2" y="9" width="4" height="12"></rect>
+              <circle cx="4" cy="4" r="2"></circle>
+            </svg>
+            LinkedIn
+          </a>
+
+          <a href="https://github.com/MatiasDeArriba" target="_blank" rel="noopener noreferrer" class="contact-link">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path>
+            </svg>
+            GitHub
+          </a>
+
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- <footer>: pie de página -->
+  <footer>
+    <div class="container">
+      <p class="footer-text">
+        hecho con <span>♥</span> en Buenos Aires · 2025
+        <!-- El span con ♥ hereda el color --color-accent del CSS -->
+      </p>
+    </div>
+  </footer>
+
+</body>
+</html>

@@ -24,6 +24,13 @@
   <title>Matias De Arriba — QA Tester</title>
   <!-- title: el texto que aparece en la pestaña del navegador -->
 
+  <!-- ===== OPEN GRAPH / TWITTER ===== -->
+  <meta property="og:title" content="Matias De Arriba — QA Tester">
+  <meta property="og:description" content="Portfolio de Matias De Arriba — QA Tester en transición a Automation con Python.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://matiasdearriba.vercel.app/">
+  <meta name="twitter:card" content="summary">
+
   <!-- ===== GOOGLE FONTS =====
        Importamos dos tipografías desde Google Fonts (gratis).
        - Inter: sans-serif moderna, muy legible en pantalla.
@@ -32,7 +39,6 @@
        con una fuente del sistema mientras carga la custom. -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%230a0a0a%22/><text x=%2250%22 y=%2268%22 font-size=%2260%22 font-family=%22monospace%22 fill=%22%237C6FF7%22 text-anchor=%22middle%22>M</text></svg>">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 
   <style>
@@ -263,6 +269,19 @@
     .hero {
       padding: 80px 0 72px;
       border-bottom: 1px solid var(--color-border);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: -200px;
+      right: -200px;
+      width: 500px;
+      height: 500px;
+      background: radial-gradient(circle, var(--color-accent-dim), transparent 70%);
+      pointer-events: none;
     }
 
     .hero-status {
@@ -355,6 +374,7 @@
     .pill:hover {
       border-color: var(--color-accent);
       color: var(--color-accent);
+      transform: scale(1.05);
     }
 
     /* ---- BOTONES ---- */
@@ -687,6 +707,20 @@
     }
 
     /* ==========================================
+       SCROLL REVEAL
+       ========================================== */
+    .reveal {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ==========================================
        RESPONSIVE — MEDIA QUERIES
        Las media queries aplican estilos solo cuando
        se cumple una condición (ancho de pantalla, etc.)
@@ -837,7 +871,7 @@
          PROYECTOS
          id="proyectos": el nav link href="#proyectos" scrollea hasta acá
          ========================================== -->
-    <section id="proyectos">
+    <section id="proyectos" class="reveal">
       <div class="container">
         <p class="section-eyebrow">// proyectos</p>
         <h2 class="section-title">Trabajo que me representa</h2>
@@ -958,7 +992,7 @@
     <!-- ==========================================
          SOBRE MÍ
          ========================================== -->
-    <section id="sobre-mi">
+    <section id="sobre-mi" class="reveal">
       <div class="container">
         <p class="section-eyebrow">// sobre mí</p>
         <h2 class="section-title">Un poco de contexto</h2>
@@ -1045,7 +1079,7 @@
     <!-- ==========================================
          CONTACTO
          ========================================== -->
-    <section id="contacto" class="contact-section">
+    <section id="contacto" class="contact-section reveal">
       <div class="container">
         <p class="section-eyebrow">// contacto</p>
         <h2 class="section-title">¿Hablamos?</h2>
@@ -1096,6 +1130,20 @@
       </p>
     </div>
   </footer>
+
+  <!-- ===== SCROLL REVEAL ===== -->
+  <script>
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.15 });
+
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+  </script>
 
 </body>
 </html>
